@@ -28,36 +28,64 @@ namespace CircuitBreakerDotNet
         {
             if (IsOpen())
             {
-                if (IsReadyToHalfOpen())
-                {
-                    var lockTaken = false;
-                    try
-                    {
-                        lockTaken = Monitor.TryEnter(_HalfOpenSyncObject);
-                        if (lockTaken)
-                        {
-                            action();
-
-                            _StateStore.Reset();
-                            return;
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        _StateStore.Trip(exception);
-                        throw;
-                    }
-                    finally
-                    {
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(_HalfOpenSyncObject);
-                        }
-                    }
-                }
-                throw CreateCircuitOpenException();
+                OpenCircuitAction(action);
+                return;
             }
 
+            ClosedCircuitAction(action);
+        }
+
+        private void OpenCircuitAction(Action action)
+        {
+            if (IsReadyToHalfOpen() && HalfOpenningCircuitSucceeds(action))
+            {
+                return;
+            }
+
+            throw CreateCircuitOpenException();
+        }
+
+        private bool HalfOpenningCircuitSucceeds(Action action)
+        {
+            var lockTaken = false;
+            try
+            {
+                lockTaken = Monitor.TryEnter(_HalfOpenSyncObject);
+                if (lockTaken)
+                {
+                    _StateStore.HalfOpen();
+
+                    action();
+
+                    _StateStore.Reset();
+
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                _StateStore.Trip(exception);
+                throw;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    Monitor.Exit(_HalfOpenSyncObject);
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsReadyToHalfOpen()
+        {
+            var isReadyToHalfOpen = _OpenToClosed.CircuitOpenIsCircuitReadyToHalfOpen(_StateStore);
+            return isReadyToHalfOpen;
+        }
+
+        private void ClosedCircuitAction(Action action)
+        {
             try
             {
                 action();
@@ -69,12 +97,6 @@ namespace CircuitBreakerDotNet
 
                 throw;
             }
-        }
-
-        private bool IsReadyToHalfOpen()
-        {
-            var isReadyToHalfOpen = _OpenToClosed.CircuitOpenIsCircuitReadyToHalfOpen(_StateStore);
-            return isReadyToHalfOpen;
         }
 
         private void TrackException(Exception exception)
