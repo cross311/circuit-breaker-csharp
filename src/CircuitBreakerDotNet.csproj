@@ -37,7 +37,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircuitBreaker.cs" />
+    <Compile Include="CircuitBreakerOpenException.cs" />
+    <Compile Include="CircuitBreakerStateEnum.cs" />
+    <Compile Include="CircuitBreakerStateStore.cs" />
+    <Compile Include="FailCountBasedCircuitBreakerClosedToOpenStateTransition.cs" />
+    <Compile Include="ICircuitBreaker.cs" />
+    <Compile Include="ICircuitBreakerClosedToOpenStateTransition.cs" />
+    <Compile Include="ICircuitBreakerOpenToClosedStateTransition.cs" />
+    <Compile Include="ICircuitBreakerState.cs" />
+    <Compile Include="ICircuitBreakerStateStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WaitTimeBasedCircuitBreakerOpenToClosedStateTransition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

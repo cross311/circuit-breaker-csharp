@@ -17,8 +17,8 @@ namespace CircuitBreakerTest
         public void TestInitialize()
         {
             _CircuitBreakerStateStore = new CircuitBreakerStateStore();
-            var closedToOpen = new FailCountBasedCircuitBreakerClosedToOpen(_FailLimit, _WaitTime);
-            var openToClosed = new WaitTimeBasedCircuitBreakerOpenToClosed(_WaitTime);
+            var closedToOpen = new FailCountBasedCircuitBreakerClosedToOpenStateTransition(_FailLimit, _WaitTime);
+            var openToClosed = new WaitTimeBasedCircuitBreakerOpenToClosedStateTransition(_WaitTime);
             _CircuitBreaker = new CircuitBreaker(_CircuitBreakerStateStore, closedToOpen, openToClosed);
         }
 
