@@ -11,7 +11,7 @@ namespace CircuitBreakerTest
         static int _FailLimit = 2;
         static TimeSpan _WaitTime = new TimeSpan(0, 0, 0, 0, 3);
         ICircuitBreakerStateStore _CircuitBreakerStateStore;
-        CircuitBreaker _CircuitBreaker;
+        ICircuitBreaker _CircuitBreaker;
 
         [TestInitialize]
         public void TestInitialize()
